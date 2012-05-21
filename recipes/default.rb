@@ -28,7 +28,7 @@
 # some brave soul will help with Windows. BSD and Solaris might be doable
 # as well with the Linx binaries though.
 
-df_downloads = [ :mac_os_x => "http://www.bay12games.com/dwarves/df_34_09_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_09_linux.tar.bz2" ]
+df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_09_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_09_linux.tar.bz2" }
 
 tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
 df_tarball = "#{tmpdir}/df-#{$$}.tar.bz2"
@@ -47,14 +47,18 @@ df_extract_dir = case node[:platform_family]
     "df_linux"
 end
 
-df_source = node[:df][:source] || df_downloads[df_platform]
+if node[:df][:source]
+  df_source = node[:df][:source]
+else
+  df_source = df_downloads[df_platform]
+end
 
 remote_file df_tarball do
-  source df_source
+  source "#{df_source}"
   mode "0644"
 end
 
-directory "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]"
+directory "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}" do
   recursive true
   owner DF_USER
   mode "0755"
@@ -63,7 +67,7 @@ end
 
 bash "unpack_dwarf_fortress" do
   user DF_USER
-  cwd "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]"
+  cwd "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}"
   code <<-EOH
     tar -jxvf #{df_tarball}
   EOH
@@ -75,8 +79,13 @@ end
 
 # Link extracted tarball to dwarf_fortress/current
 link "#{DF_HOME}/dwarf_fortress/current" do
-  source "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]/#{df_extract_dir}"
+  action :delete
+end
+
+link "#{DF_HOME}/dwarf_fortress/current" do
   owner DF_USER
+  to "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}/#{df_extract_dir}"
+  action :create
 end
 
 # TODO: With linux, we'll need to install some libs at this point.
