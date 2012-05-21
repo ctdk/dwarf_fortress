@@ -89,3 +89,38 @@ link "#{DF_HOME}/dwarf_fortress/current" do
 end
 
 # TODO: With linux, we'll need to install some libs at this point.
+if node[:os] == "linux"
+  case node[:platform]
+    when "debian"
+      # install 32 bit libs - TODO: on the off chance we're 32 bit Linux, we 
+      # don't want to do it this way
+      package "ia32-libs"
+	action :upgrade
+      end
+      package "ia32-libs-gtk"
+	action :upgrade
+      end
+      remote_file "#{tmpdir}/libsdl-ttf2.0-0_2.0.9-1_i386.deb"
+	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-ttf2.0/libsdl-ttf2.0-0_2.0.9-1_i386.deb"
+	mode "0644"
+      end
+      remote_file "#{tmpdir}/libsdl-image1.2_1.2.10-2+b2_i386.deb"
+	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-image1.2/libsdl-image1.2_1.2.10-2+b2_i386.deb"
+	mode "0644"
+      end
+      bash "install_32bit_libs" do
+	user "root"
+	cwd tmpdir
+	code <<-EOH
+	  dpkg -x libsdl-image1.2_1.2.10-2+b2_i386.deb .
+	  dpkg -x libsdl-ttf2.0-0_2.0.9-1_i386.deb .
+	  cp usr/lib/* /usr/lib32/
+	  cd /usr/lib32
+	  ln -s libopenal.so.1 libopenal.so
+	  ln -s libsndfile.so.1 libsndfile.so
+	  ln -s libSDL_ttf-2.0.so.0 libSDL_ttf-2.0.so
+	EOH
+      end
+
+  end
+end
