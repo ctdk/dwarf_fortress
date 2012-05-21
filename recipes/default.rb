@@ -94,17 +94,17 @@ if node[:os] == "linux"
     when "debian"
       # install 32 bit libs - TODO: on the off chance we're 32 bit Linux, we 
       # don't want to do it this way
-      package "ia32-libs"
+      package "ia32-libs" do
 	action :upgrade
       end
-      package "ia32-libs-gtk"
+      package "ia32-libs-gtk" do
 	action :upgrade
       end
-      remote_file "#{tmpdir}/libsdl-ttf2.0-0_2.0.9-1_i386.deb"
+      remote_file "#{tmpdir}/libsdl-ttf2.0-0_2.0.9-1_i386.deb" do
 	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-ttf2.0/libsdl-ttf2.0-0_2.0.9-1_i386.deb"
 	mode "0644"
       end
-      remote_file "#{tmpdir}/libsdl-image1.2_1.2.10-2+b2_i386.deb"
+      remote_file "#{tmpdir}/libsdl-image1.2_1.2.10-2+b2_i386.deb" do
 	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-image1.2/libsdl-image1.2_1.2.10-2+b2_i386.deb"
 	mode "0644"
       end
@@ -121,6 +121,5 @@ if node[:os] == "linux"
 	  ln -s libSDL_ttf-2.0.so.0 libSDL_ttf-2.0.so
 	EOH
       end
-
   end
 end
