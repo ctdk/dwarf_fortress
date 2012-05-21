@@ -35,7 +35,7 @@ df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"
 df_platform = case node[:os]
   when "darwin"
     :mac_os_x
-  when "debian"
+  when "linux"
     # Other linuxes presumably need their own 32 bit libs - do later
     :linux
 end
@@ -43,7 +43,7 @@ end
 df_extract_dir = case node[:os]
   when "darwin"
     "df_osx"
-  when "debian"
+  when "linux"
     "df_linux"
 end
 

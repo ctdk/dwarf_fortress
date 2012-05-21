@@ -26,7 +26,7 @@
 raise "sudo to root before running" if ENV['SUDO_USER'].nil?
 
 DF_USER = ENV['SUDO_USER'].strip
-DF_HOME = ENV['HOME']
+DF_HOME = (ENV['HOME'] != "/root") ? ENV['HOME'] : `getent passwd $SUDO_USER | cut -d: -f6`.strip
 DF_LIBRARY = "#{DF_HOME}/Library"
 
 raise "should not be root" if DF_USER=="root"
