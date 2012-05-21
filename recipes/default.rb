@@ -32,16 +32,16 @@ df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_10_osx.ta
 
 tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
 df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"
-df_platform = case node[:platform_family]
-  when "mac_os_x"
+df_platform = case node[:os]
+  when "darwin"
     :mac_os_x
   when "debian"
     # Other linuxes presumably need their own 32 bit libs - do later
     :linux
 end
 
-df_extract_dir = case node[:platform_family]
-  when "mac_os_x"
+df_extract_dir = case node[:os]
+  when "darwin"
     "df_osx"
   when "debian"
     "df_linux"
