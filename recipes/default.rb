@@ -31,7 +31,7 @@
 df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_09_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_09_linux.tar.bz2" }
 
 tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
-df_tarball = "#{tmpdir}/df-#{$$}.tar.bz2"
+df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"
 df_platform = case node[:platform_family]
   when "mac_os_x"
     :mac_os_x
@@ -58,8 +58,13 @@ remote_file df_tarball do
   mode "0644"
 end
 
+directory "#{DF_HOME}/dwarf_fortress" do
+  owner DF_USER
+  mode "0755"
+  action :create
+end
+
 directory "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}" do
-  recursive true
   owner DF_USER
   mode "0755"
   action :create
@@ -73,17 +78,12 @@ bash "unpack_dwarf_fortress" do
   EOH
 end
 
-file df_tarball do
-  action :delete
-end
-
 # Link extracted tarball to dwarf_fortress/current
 link "#{DF_HOME}/dwarf_fortress/current" do
   action :delete
 end
 
 link "#{DF_HOME}/dwarf_fortress/current" do
-  owner DF_USER
   to "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}/#{df_extract_dir}"
   action :create
 end
