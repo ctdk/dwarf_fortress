@@ -3,7 +3,11 @@ maintainer_email "jbingham@gmail.com"
 license          "MIT"
 description      "Installs/Configures dwarf_fortress"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "0.2.1"
+version          "0.2.2"
+
+%w{ mac_os_x debian }.each do |os|
+  supports os
+end
 
 attribute "df",
   :display_name => "Dwarf Fortress hash",
