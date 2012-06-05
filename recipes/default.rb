@@ -91,7 +91,8 @@ end
 # TODO: With linux, we'll need to install some libs at this point.
 if node[:os] == "linux"
   case node[:platform]
-    when "debian"
+    # TODO: Test that debian files will work with Ubuntu
+    when "debian", "ubuntu"
       # install 32 bit libs - TODO: on the off chance we're 32 bit Linux, we 
       # don't want to do it this way
       package "ia32-libs" do
@@ -121,5 +122,16 @@ if node[:os] == "linux"
 	  ln -s libSDL_ttf-2.0.so.0 libSDL_ttf-2.0.so
 	EOH
       end
+    # TODO: test Arch linux too.
+    when "arch"
+      %w{ lib32-gtk2 lib32-libsndfile lib32-libxdamage lib32-mesa lib32-ncurses lib32-openal lib32-sdl_image lib32-sdl_ttf }.each do |arch_pkg|
+	package arch_pkg do
+	  action :install
+	end
+      end
+    # TODO: this cover CentOS?
+    when "fedora"
+
+    end
   end
 end
