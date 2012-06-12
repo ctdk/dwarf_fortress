@@ -28,7 +28,7 @@
 # some brave soul will help with Windows. BSD and Solaris might be doable
 # as well with the Linx binaries though.
 
-df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_10_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_10_linux.tar.bz2" }
+df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_11_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2" }
 
 tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
 df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"

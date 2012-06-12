@@ -1,1 +1,1 @@
-default[:df][:version] = "df_0.34.10"
+default[:df][:version] = "df_0.34.11"
