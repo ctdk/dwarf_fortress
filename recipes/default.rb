@@ -2,7 +2,7 @@
 # Cookbook Name:: dwarf_fortress
 # Recipe:: default
 #
-# Copyright 2012, Jeremy Bingham
+# Copyright 2012-2015, Jeremy Bingham
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -28,16 +28,19 @@
 # some brave soul will help with Windows. BSD and Solaris might be doable
 # as well with the Linx binaries though.
 
-df_downloads = { :mac_os_x => "http://www.bay12games.com/dwarves/df_34_11_osx.tar.bz2", :linux => "http://www.bay12games.com/dwarves/df_34_11_linux.tar.bz2" }
+version = node[:df][:version]
+version =~ /(\d+)\.(\d+)\.(\d+)/
+df_minor = $2
+df_patch = $3
 
 tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
 df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"
 df_platform = case node[:os]
   when "darwin"
-    :mac_os_x
+    "osx"
   when "linux"
     # Other linuxes presumably need their own 32 bit libs - do later
-    :linux
+    "linux"
 end
 
 df_extract_dir = case node[:os]
@@ -47,11 +50,7 @@ df_extract_dir = case node[:os]
     "df_linux"
 end
 
-if node[:df][:source]
-  df_source = node[:df][:source]
-else
-  df_source = df_downloads[df_platform]
-end
+df_source = node[:df][:source] || "http://www.bay12games.com/dwarves/df_#{df_minor}_#{df_patch}_#{df_platform}.tar.bz2"
 
 remote_file df_tarball do
   source "#{df_source}"
@@ -88,38 +87,37 @@ link "#{DF_HOME}/dwarf_fortress/current" do
   action :create
 end
 
-# TODO: With linux, we'll need to install some libs at this point.
+# For recent debians/ubuntus.
 if node[:os] == "linux"
-  case node[:platform]
+  case node[:platform_family]
     when "debian"
       # install 32 bit libs - TODO: on the off chance we're 32 bit Linux, we 
       # don't want to do it this way
-      package "ia32-libs" do
-	action :upgrade
+      package "multiarch-support" do
+	action :install
       end
-      package "ia32-libs-gtk" do
-	action :upgrade
-      end
-      remote_file "#{tmpdir}/libsdl-ttf2.0-0_2.0.9-1_i386.deb" do
-	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-ttf2.0/libsdl-ttf2.0-0_2.0.9-1_i386.deb"
-	mode "0644"
-      end
-      remote_file "#{tmpdir}/libsdl-image1.2_1.2.10-2+b2_i386.deb" do
-	source "http://ftp.us.debian.org/debian/pool/main/s/sdl-image1.2/libsdl-image1.2_1.2.10-2+b2_i386.deb"
-	mode "0644"
-      end
-      bash "install_32bit_libs" do
+      bash "add-i386" do
 	user "root"
-	cwd tmpdir
 	code <<-EOH
-	  dpkg -x libsdl-image1.2_1.2.10-2+b2_i386.deb .
-	  dpkg -x libsdl-ttf2.0-0_2.0.9-1_i386.deb .
-	  cp usr/lib/* /usr/lib32/
-	  cd /usr/lib32
-	  ln -s libopenal.so.1 libopenal.so
-	  ln -s libsndfile.so.1 libsndfile.so
-	  ln -s libSDL_ttf-2.0.so.0 libSDL_ttf-2.0.so
+	  dpkg --add-architecture i386
+	  apt-get update
 	EOH
+      end
+      %w(libgtk2.0-0:i386 libglu1-mesa:i386 libsdl-image1.2:i386 libsdl-sound1.2:i386 libsdl-ttf2.0-0:i386 libopenal1:i386).each do |pkg|
+	package pkg
       end
   end
 end
+
+# For some reason this keeps insisting on running before the tarball has been
+# unpacked. Hmmm.
+#
+# Trying to include the init.txt in this cookbook as a template is pretty much
+# guaranteed not to consistently work between versions of Dwarf Fortress, so
+# instead just replace the PRINT_MODE with the value in node[:df][:output].
+#print_mode = node[:df][:output].upcase
+#init_txt = "#{DF_HOME}/dwarf_fortress/current/data/init/init.txt"
+#::File.write(init_txt, ::File.open(init_txt, &:read).gsub(/\[PRINT_MODE:2D\]/, "PRINT_MODE:#{print_mode}"))
+#file = Chef::Util.FileEdit.new(init_txt)
+#file.search_file_replace(/\[PRINT_MODE:2D\]/, "PRINT_MODE:#{print_mode}")
+#file.write_file

@@ -1,1 +1,2 @@
-default[:df][:version] = "df_0.34.11"
+default[:df][:version] = "0.40.24"
+default[:df][:output] = "2d"
