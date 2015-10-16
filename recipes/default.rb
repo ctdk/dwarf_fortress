@@ -75,6 +75,7 @@ bash 'unpack_dwarf_fortress' do
   code <<-EOH
     tar -jxvf #{df_tarball}
   EOH
+  notifies :run, "ruby_block[df_init_update]", :delayed
 end
 
 # Link extracted tarball to dwarf_fortress/current
@@ -115,9 +116,14 @@ end
 # Trying to include the init.txt in this cookbook as a template is pretty much
 # guaranteed not to consistently work between versions of Dwarf Fortress, so
 # instead just replace the PRINT_MODE with the value in node[:df][:output].
-#print_mode = node[:df][:output].upcase
-#init_txt = "#{DF_HOME}/dwarf_fortress/current/data/init/init.txt"
-#::File.write(init_txt, ::File.open(init_txt, &:read).gsub(/\[PRINT_MODE:2D\]/, "PRINT_MODE:#{print_mode}"))
-#file = Chef::Util.FileEdit.new(init_txt)
-#file.search_file_replace(/\[PRINT_MODE:2D\]/, "PRINT_MODE:#{print_mode}")
-#file.write_file
+ruby_block "df_init_update" do
+  block do
+    print_mode = node[:df][:output].upcase
+    init_txt = "#{DF_HOME}/dwarf_fortress/current/data/init/init.txt"
+    #::File.write(init_txt, ::File.open(init_txt, &:read).gsub(/\[PRINT_MODE:2D\]/, "PRINT_MODE:#{print_mode}"))
+    file = Chef::Util::FileEdit.new(init_txt)
+    file.search_file_replace(/\[PRINT_MODE:2D\]/, "[PRINT_MODE:#{print_mode}]")
+    file.write_file
+  end
+  action :nothing
+end
