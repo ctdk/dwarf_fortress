@@ -1,4 +1,5 @@
 *~
+<<<<<<< HEAD
 *#
 .#*
 \#*#
@@ -16,5 +17,8 @@ Gemfile.lock
 bin/*
 .bundle/*
 
+=======
+.DS_Store
+>>>>>>> lazynewb
 .kitchen/
 .kitchen.local.yml

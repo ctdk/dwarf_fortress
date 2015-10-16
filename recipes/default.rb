@@ -33,7 +33,7 @@ version =~ /(\d+)\.(\d+)\.(\d+)/
 df_minor = $2
 df_patch = $3
 
-tmpdir = ENV['TMP'] || ENV['TMPDIR'] || "/tmp"
+tmpdir = ENV['TMP'] || ENV['TMPDIR'] || '/tmp'
 df_tarball = "#{tmpdir}/#{node[:df][:version]}.tar.bz2"
 df_platform = case node[:os]
   when "darwin"
@@ -44,32 +44,32 @@ df_platform = case node[:os]
 end
 
 df_extract_dir = case node[:os]
-  when "darwin"
-    "df_osx"
-  when "linux"
-    "df_linux"
-end
+                 when 'darwin'
+                   'df_osx'
+                 when 'linux'
+                   'df_linux'
+                 end
 
 df_source = node[:df][:source] || "http://www.bay12games.com/dwarves/df_#{df_minor}_#{df_patch}_#{df_platform}.tar.bz2"
 
 remote_file df_tarball do
   source "#{df_source}"
-  mode "0644"
+  mode '0644'
 end
 
 directory "#{DF_HOME}/dwarf_fortress" do
   owner DF_USER
-  mode "0755"
+  mode '0755'
   action :create
 end
 
 directory "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}" do
   owner DF_USER
-  mode "0755"
+  mode '0755'
   action :create
 end
 
-bash "unpack_dwarf_fortress" do
+bash 'unpack_dwarf_fortress' do
   user DF_USER
   cwd "#{DF_HOME}/dwarf_fortress/#{node[:df][:version]}"
   code <<-EOH
