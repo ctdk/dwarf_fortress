@@ -1,0 +1,19 @@
+---
+driver:
+  name: vagrant
+  customize:
+    cpus: 4
+    memory: 8096
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: ubuntu-14.04
+  - name: centos-7.1
+  - name: windows-10
+
+suites:
+  - name: default
+    run_list: dwarf-fortress::default
+    attributes:
